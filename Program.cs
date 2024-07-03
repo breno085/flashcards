@@ -1,4 +1,5 @@
-﻿using flashcards.Repositories;
+﻿using flashcards.Controllers;
+using flashcards.Repositories;
 
 class Program
 {
@@ -17,5 +18,8 @@ class Program
             // Basic exception handling to log any errors that occur
             Console.WriteLine($"An error occurred while creating tables: {ex.Message}");
         }
+
+        new GetUserInput().MainMenu();
+
     }
 }
