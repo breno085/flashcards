@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using flashcards.Models;
+using flashcards.Repositories;
 
 namespace flashcards.Controllers
 {
@@ -90,36 +86,49 @@ namespace flashcards.Controllers
         {
             GetStacks();
 
-            Console.WriteLine("Type 0 to exit\n");
+            Console.WriteLine("\nType 0 to exit\n");
             string answer = Console.ReadLine();
         }
+
         private void DeleteStacks()
         {
+            var userRepository = new UserRepository();
+
             GetStacks();
 
-            Console.WriteLine("Input the name of the stack you want to delete");
+            Console.WriteLine("\nInput the name of the stack you want to delete");
             Console.WriteLine("or type 0 to exit\n");
-            string answer = Console.ReadLine();
+            string stack = Console.ReadLine();
+
+            userRepository.DeleteStackData(stack);
         }
+
         private void InsertStacks()
         {
+            var userRepository = new UserRepository();
+
             GetStacks();
 
-            Console.WriteLine("Input the name of the stack you want to insert");
+            Console.WriteLine("\nInput the name of a stack you want to insert");
             Console.WriteLine("or type 0 to exit\n");
-            string answer = Console.ReadLine();
+            string stack = Console.ReadLine();
+
+            userRepository.InsertStackData(stack);
         }
 
         private void GetStacks()
         {
-            Console.WriteLine("tbd");
+            var userRepository = new UserRepository();
+
+            Console.WriteLine("Current Stacks");
+            userRepository.ViewStacksData();
         }
 
         private void FlashcardsMenu()
         {
             GetStacks();
 
-            Console.WriteLine("Choose the name of the stacks of flashcards you want to interact with");
+            Console.WriteLine("\nChoose the name of the stack of flashcards you want to interact with");
             Console.WriteLine("Or type 0 to return to the main menu\n");
 
             string answer = Console.ReadLine();
@@ -128,6 +137,20 @@ namespace flashcards.Controllers
 
         }
 
+        private void CreateFlashcards(string stackName)
+        {
+            var userRepository = new UserRepository();
+
+            Console.WriteLine($"{stackName} stack\n");
+            Console.WriteLine("Write the front of your flashcard: ");
+            string front = Console.ReadLine();
+
+            Console.WriteLine("Write the back of your flashcard: ");
+            string back = Console.ReadLine();
+
+            userRepository.InsertFlashcardsData(stackName, front, back);
+
+        }
         private void ManageFlashcards(string stack)
         {
             bool exit = false;
@@ -148,14 +171,13 @@ namespace flashcards.Controllers
                 {
                     case "0":
                         exit = true;
-                        Environment.Exit(0);
                         break;
                     case "1":
-                        ManageStacks();
                         break;
                     case "2":
                         break;
                     case "3":
+                        CreateFlashcards(stack);
                         break;
                     case "4":
                         break;
