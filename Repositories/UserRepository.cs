@@ -21,7 +21,64 @@ namespace flashcards.Repositories
             }
         }
 
-        public void InsertFlashcardsData(string stackName, string front, string back)
+        public void UpdateFlashcardsData(int id, string frontOrBack, string text)
+        {
+            string column = frontOrBack.ToLower() == "front" ? "Front" : "Back";
+            var sql = $"UPDATE Flashcards SET {column} = @Text WHERE Id = @Id";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Execute(sql, new { Text = text, Id = id });
+            }
+        }
+
+        public void DeleteFlashcardsData(int id)
+        {
+            var sql = "DELETE FROM Flashcards WHERE Id = @Id";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Execute(sql, new { Id = id });
+            }
+        }
+
+        public void ViewFlashcardsFrontData(string stackName)
+        {
+            int stackId = GetStackId(stackName);
+
+            var sql = $"SELECT Id, Front FROM Flashcards WHERE StackId = {stackId}";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var flashcards = connection.Query<Flashcards>(sql);
+
+                Console.WriteLine("Id\tFront");
+                foreach (var flashcard in flashcards)
+                {
+                    Console.WriteLine($"{flashcard.Id}\t{flashcard.Front}");
+                }
+            }
+        }
+        
+        public void ViewAllFlashcardsData(string stackName)
+        {
+            int stackId = GetStackId(stackName);
+
+            var sql = $"SELECT * FROM Flashcards WHERE StackId = {stackId}";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var flashcards = connection.Query<Flashcards>(sql);
+
+                Console.WriteLine("Id\tFront\tBack\tStackId");
+                foreach (var flashcard in flashcards)
+                {
+                    Console.WriteLine($"{flashcard.Id}\t{flashcard.Front}\t{flashcard.Back}\t{flashcard.StackId}");
+                }
+            }
+        }
+
+        public int GetStackId(string stackName)
         {
             int stackId;
             var stackIdSql = "SELECT Id FROM Stacks WHERE LanguageName = @StackName";
@@ -31,6 +88,11 @@ namespace flashcards.Repositories
                 connection.Open();
                 stackId = connection.ExecuteScalar<int>(stackIdSql, new { StackName = stackName });
             }
+            return stackId;
+        }
+        public void InsertFlashcardsData(string stackName, string front, string back)
+        {
+            int stackId = GetStackId(stackName);
 
             var sql = "INSERT INTO Flashcards (Front, Back, StackId) VALUES (@Front, @Back, @StackId)";
 
