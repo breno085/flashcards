@@ -8,4 +8,5 @@ o que eu devo fazer em seguida:
 2. Create (x) -> View All (x) -> View Front (x) -> Delete (x) -> Edit flashcards (x)
 3. User data validation
 4. Create study session -> view study session data
-5. Report System Challenge
+5. Spectre Console
+6. Report System Challenge
