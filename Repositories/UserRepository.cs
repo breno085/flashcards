@@ -1,8 +1,6 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
 using flashcards.Models;
-using System.Data.Common;
-using flashcards.Controllers;
 using flashcards.Utils;
 
 namespace flashcards.Repositories

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using flashcards.Models;
 using flashcards.Repositories;
 
@@ -9,7 +5,7 @@ namespace flashcards.Services
 {
     public class InsertData
     {
-        //inserting some data in the flashcards table
+        //inserting some data in the flashcards table for tests
 
         public void InsertFlashcardsData()
         {
