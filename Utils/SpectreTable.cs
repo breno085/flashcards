@@ -16,8 +16,8 @@ namespace flashcards.Utils
             foreach (var stack in stackData)
             {
                 table.AddRow(
-                    stack.Id.ToString(),
                     // displayId.ToString(),
+                    stack.Id.ToString(),
                     stack.LanguageName
                 );
                 // displayId++;
@@ -33,16 +33,16 @@ namespace flashcards.Utils
             table.AddColumn("Front");
             table.AddColumn("Back");
             
-            // int displayId = 1;
+            int displayId = 1;
             foreach (var flashcard in flashcards)
             {
                 table.AddRow(
-                    // displayId.ToString(),
-                    flashcard.Id.ToString(),
+                    // flashcard.Id.ToString(),
+                    displayId.ToString(),
                     flashcard.Front,
                     flashcard.Back
                 );
-                // displayId++;
+                displayId++;
             }
             AnsiConsole.Write(table);
         }
@@ -55,15 +55,15 @@ namespace flashcards.Utils
             table.AddColumn("Id");
             table.AddColumn("Front");
 
-            // int displayId = 1;
+            int displayId = 1;
             foreach (var flashcard in flashcards)
             {
                 table.AddRow(
-                    flashcard.Id.ToString(),
-                    // displayId.ToString(),
+                    // flashcard.Id.ToString(),
+                    displayId.ToString(),
                     flashcard.Front
                 );
-                // displayId++;
+                displayId++;
             }
             AnsiConsole.Write(table);
         }

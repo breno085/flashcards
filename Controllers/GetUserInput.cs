@@ -279,10 +279,6 @@ namespace flashcards.Controllers
 
             List<int> flashcardsId = UserRepository.GetFlashcardsId(stackName);
 
-            //o número de ids será o número de linhas
-            //tenho que fazer uma comparação tal que o primeiro Id
-            //mostrado na tabela do console seja equivalente ao Id real da tabela
-            //
             int[] flashcardsConsoleId = new int[flashcardsId.Count];
 
             for (int i = 0; i < flashcardsConsoleId.Length; i++)
@@ -290,17 +286,14 @@ namespace flashcards.Controllers
                 flashcardsConsoleId[i] = 1 + i;
             }
 
-            //se o id que o usuário selecionar for 1, retornar o primeiro elemento de flashcardsId
-            //se o id que o usuário selecionar for 2, retornar o segundo elemento de flashcardsId
-
             while (true)
             {
                 Console.WriteLine($"Type the Id of the card you want to {updateDelete}:");
 
                 if (int.TryParse(Console.ReadLine(), out int id))
                 {
-                    if (flashcardsId.Contains(id))
-                        return id;
+                    if (flashcardsConsoleId.Contains(id))
+                        return flashcardsId[id - 1];
                 }
 
                 Console.WriteLine("Type a valid Id.");
