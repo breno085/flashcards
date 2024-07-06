@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using flashcards.Models;
 using System.Data.Common;
 using flashcards.Controllers;
+using flashcards.Utils;
 
 namespace flashcards.Repositories
 {
@@ -209,13 +210,13 @@ namespace flashcards.Repositories
 
                 List<string> stackNames = new List<string>();
 
-                Console.WriteLine("Id\tName");
-                foreach (var stack in stacks)
-                {
-                    stackNames.Add(stack.LanguageName);
-                    Console.WriteLine($"{stack.Id}\t{stack.LanguageName}");
-                }
-
+                SpectreTable.StackTable(stacks);
+                // Console.WriteLine("Id\tName");
+                // foreach (var stack in stacks)
+                // {
+                //     stackNames.Add(stack.LanguageName);
+                //     Console.WriteLine($"{stack.Id}\t{stack.LanguageName}");
+                // }
                 return stackNames;
             }
         }
