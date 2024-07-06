@@ -55,14 +55,9 @@ namespace flashcards.Repositories
             {
                 var flashcards = connection.Query<Flashcards>(sql);
 
-                Console.WriteLine("Id\tFront");
-                foreach (var flashcard in flashcards)
-                {
-                    Console.WriteLine($"{flashcard.Id}\t{flashcard.Front}");
-                }
+                SpectreTable.FlashcardsFrontTable(flashcards);
             }
         }
-
         public List<int> GetFlashcardsId(string stackName)
         {
             int stackId = GetStackId(stackName);
@@ -92,11 +87,7 @@ namespace flashcards.Repositories
             {
                 var flashcards = connection.Query<Flashcards>(sql);
 
-                Console.WriteLine("Id\tFront\t\t\tBack");
-                foreach (var flashcard in flashcards)
-                {
-                    Console.WriteLine($"{flashcard.Id}\t{flashcard.Front}\t\t\t{flashcard.Back}");
-                }
+                SpectreTable.FlashcardsTable(flashcards);
             }
         }
 
@@ -104,11 +95,11 @@ namespace flashcards.Repositories
         {
             int stackId = GetStackId(stackName);
 
-            var sql = $"INSERT INTO Study (Score, StackId) VALUES (@Score, @StackId)";
+            var sql = $"INSERT INTO Study (Date, Score, StackId) VALUES (@Date, @Score, @StackId)";
 
             using (var connection = new SqlConnection(connectionString))
             {
-                connection.Execute(sql, new { Score = score, StackId = stackId });
+                connection.Execute(sql, new { Date = DateTime.Now, Score = score, StackId = stackId });
             }
         }
 
@@ -120,11 +111,7 @@ namespace flashcards.Repositories
             {
                 var study = connection.Query<Study>(sql);
 
-                Console.WriteLine("Id\tDate\t\tScore\tStackId");
-                foreach (var session in study)
-                {
-                    Console.WriteLine($"{session.Id}\t{session.Date}\t{session.Score}\t{session.StackId}");
-                }
+                SpectreTable.StudyTable(study);
             }
         }
 
@@ -209,6 +196,11 @@ namespace flashcards.Repositories
                 var stacks = connection.Query<Stacks>(sql);
 
                 List<string> stackNames = new List<string>();
+
+                foreach (var stack in stacks)
+                {
+                    stackNames.Add(stack.LanguageName);
+                }
 
                 SpectreTable.StackTable(stacks);
                 // Console.WriteLine("Id\tName");
