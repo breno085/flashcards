@@ -33,10 +33,10 @@ namespace flashcards.Controllers
                         FlashcardsMenu();
                         break;
                     case "3":
-                        Console.WriteLine("tbd");
+                        Study();
                         break;
                     case "4":
-                        Console.WriteLine("tbd");
+                        ViewStudySession();
                         break;
                     default:
                         Console.WriteLine("Type a valid option.");
@@ -44,6 +44,58 @@ namespace flashcards.Controllers
                 }
             }
 
+        }
+
+        public void ViewStudySession()
+        {
+            var userRepository = new UserRepository();
+
+            userRepository.ViewStudySessionData();
+        }
+
+        public void Study()
+        {
+            var userRepository = new UserRepository();
+            string stackName = GetStackName("study");
+
+            List<int> flashcardsId = userRepository.GetFlashcardsId(stackName);
+
+            int score = 0;
+
+            for (int i = 0; i < flashcardsId.Count; i++)
+            {
+                string front = userRepository.GetFlashcardsFront(flashcardsId[i]);
+                Console.WriteLine("Front");
+                Console.WriteLine(front);
+
+                Console.WriteLine("\nInput your answer to this card or 0 to exit:");
+                string answer = Console.ReadLine().Trim();
+
+                string back = userRepository.GetFlashcardsBack(flashcardsId[i]);
+
+                if (answer == "0")
+                {
+                    MainMenu();
+                    return;
+                }
+
+                if (back == answer)
+                {
+                    score++;
+                    Console.WriteLine("Correct!\n");
+                }
+                else
+                {
+                    Console.WriteLine($"Your answered {answer}.");
+                    Console.WriteLine("Your answer was wrong.");
+                    Console.WriteLine($"The correct answer is {back}\n.");
+
+                    Console.WriteLine("Type any key to continue...");
+                    Console.ReadLine();
+                }
+            }
+            Console.WriteLine($"You scored {score}/{flashcardsId.Count}.");
+            userRepository.InsertStudyData(stackName, score);
         }
 
         private void ManageStacks()
@@ -86,21 +138,17 @@ namespace flashcards.Controllers
         {
             GetStacks();
 
-            Console.WriteLine("\nType 0 to exit\n");
-            string answer = Console.ReadLine();
+            Console.WriteLine("\nType any key to exit\n");
+            Console.ReadLine();
         }
 
         private void DeleteStacks()
         {
             var userRepository = new UserRepository();
+            string stack = GetStackName("delete");
 
-            GetStacks();
-
-            Console.WriteLine("\nInput the name of the stack you want to delete");
-            Console.WriteLine("or type 0 to exit\n");
-            string stack = Console.ReadLine();
-
-            userRepository.DeleteStackData(stack);
+            if (stack != "0")
+                userRepository.DeleteStackData(stack);
         }
 
         private void InsertStacks()
@@ -116,25 +164,45 @@ namespace flashcards.Controllers
             userRepository.InsertStackData(stack);
         }
 
-        private void GetStacks()
+        public string GetStackName(string interact)
+        {
+            var userRepository = new UserRepository();
+
+            List<string> stackNames = userRepository.ViewStacksData();
+
+            while (true)
+            {
+                Console.WriteLine($"\nInput the name of a stack you want to {interact}");
+                Console.WriteLine("or type 0 to exit\n");
+                string stack = Console.ReadLine();
+
+                if (stackNames.Contains(stack))
+                {
+                    return stack;
+                }
+                if (stack == "0")
+                {
+                    MainMenu();
+                    return "0";
+                }
+                Console.WriteLine("Please, type the name of one of the current stacks avaible.");
+            }
+        }
+
+        private List<string> GetStacks()
         {
             var userRepository = new UserRepository();
 
             Console.WriteLine("Current Stacks");
-            userRepository.ViewStacksData();
+            return userRepository.ViewStacksData();
         }
 
         private void FlashcardsMenu()
         {
-            GetStacks();
+            string stack = GetStackName("interact with");
 
-            Console.WriteLine("\nChoose the name of the stack of flashcards you want to interact with");
-            Console.WriteLine("Or type 0 to return to the main menu\n");
-
-            string answer = Console.ReadLine();
-
-            ManageFlashcards(answer);
-
+            if (stack != "0")
+                ManageFlashcards(stack);
         }
 
         private void DeleteFlashcards(string stackName)
@@ -143,7 +211,7 @@ namespace flashcards.Controllers
 
             userRepository.ViewAllFlashcardsData(stackName);
 
-            int id = GetFlashcardId("delete");
+            int id = GetFlashcardId(stackName, "delete");
 
             userRepository.DeleteFlashcardsData(id);
         }
@@ -156,8 +224,8 @@ namespace flashcards.Controllers
             userRepository.ViewAllFlashcardsData(stackName);
 
             while (!exit)
-            {    
-                int id = GetFlashcardId("edit");
+            {
+                int id = GetFlashcardId(stackName, "edit");
                 string column = GetColumnName();
                 string text = GetNewText();
 
@@ -175,7 +243,7 @@ namespace flashcards.Controllers
 
         public bool ContinueEditing()
         {
-            while(true)
+            while (true)
             {
                 Console.WriteLine("Do you want to continue editing? Type 'yes' to continue, or 'no' to exit:");
                 string answer = Console.ReadLine().Trim().ToLower();
@@ -195,27 +263,32 @@ namespace flashcards.Controllers
             {
                 Console.WriteLine("Type the column you want to edit - front or back:");
                 string column = Console.ReadLine().Trim().ToLower();
-                
+
                 if (column == "front" || column == "back")
                 {
                     return column;
                 }
-                
+
                 Console.WriteLine("Invalid input. Please type 'front or 'back'.");
             }
         }
 
-        public int GetFlashcardId(string updateDelete)
+        public int GetFlashcardId(string stackName, string updateDelete)
         {
-            while(true)
+            var UserRepository = new UserRepository();
+
+            List<int> flashcardsId = UserRepository.GetFlashcardsId(stackName);
+
+            while (true)
             {
                 Console.WriteLine($"Type the Id of the card you want to {updateDelete}:");
 
                 if (int.TryParse(Console.ReadLine(), out int id))
                 {
-                    return id;
+                    if (flashcardsId.Contains(id))
+                        return id;
                 }
-                
+
                 Console.WriteLine("Type a valid Id.");
             }
         }
@@ -226,8 +299,8 @@ namespace flashcards.Controllers
 
             userRepository.ViewFlashcardsFrontData(stackName);
 
-            Console.WriteLine("\nType 0 to exit\n");
-            string answer = Console.ReadLine();
+            Console.WriteLine("\nType any key to exit\n");
+            Console.ReadLine();
 
         }
 
@@ -237,8 +310,8 @@ namespace flashcards.Controllers
 
             userRepository.ViewAllFlashcardsData(stackName);
 
-            Console.WriteLine("\nType 0 to exit\n");
-            string answer = Console.ReadLine();
+            Console.WriteLine("\nType any key to exit\n");
+            Console.ReadLine();
         }
 
         private void CreateFlashcards(string stackName)

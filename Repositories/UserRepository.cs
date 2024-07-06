@@ -1,6 +1,8 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
 using flashcards.Models;
+using System.Data.Common;
+using flashcards.Controllers;
 
 namespace flashcards.Repositories
 {
@@ -59,22 +61,89 @@ namespace flashcards.Repositories
                 }
             }
         }
-        
+
+        public List<int> GetFlashcardsId(string stackName)
+        {
+            int stackId = GetStackId(stackName);
+            List<int> flashcardsId = new List<int>();
+
+            var sql = $"SELECT Id FROM Flashcards WHERE StackId = {stackId}";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var flashcards = connection.Query<int>(sql);
+
+                foreach (int flashcard in flashcards)
+                {
+                    flashcardsId.Add(flashcard);
+                }
+            }
+            return flashcardsId;
+        }
+
         public void ViewAllFlashcardsData(string stackName)
         {
             int stackId = GetStackId(stackName);
 
-            var sql = $"SELECT * FROM Flashcards WHERE StackId = {stackId}";
+            var sql = $"SELECT Id, Front, Back FROM Flashcards WHERE StackId = {stackId}";
 
             using (var connection = new SqlConnection(connectionString))
             {
                 var flashcards = connection.Query<Flashcards>(sql);
 
-                Console.WriteLine("Id\tFront\tBack\tStackId");
+                Console.WriteLine("Id\tFront\t\t\tBack");
                 foreach (var flashcard in flashcards)
                 {
-                    Console.WriteLine($"{flashcard.Id}\t{flashcard.Front}\t{flashcard.Back}\t{flashcard.StackId}");
+                    Console.WriteLine($"{flashcard.Id}\t{flashcard.Front}\t\t\t{flashcard.Back}");
                 }
+            }
+        }
+
+        public void InsertStudyData(string stackName, int score)
+        {
+            int stackId = GetStackId(stackName);
+
+            var sql = $"INSERT INTO Study (Score, StackId) VALUES (@Score, @StackId)";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Execute(sql, new { Score = score, StackId = stackId });
+            }
+        }
+
+        public void ViewStudySessionData()
+        {
+            var sql = "SELECT * FROM Study";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var study = connection.Query<Study>(sql);
+
+                Console.WriteLine("Id\tDate\t\tScore\tStackId");
+                foreach (var session in study)
+                {
+                    Console.WriteLine($"{session.Id}\t{session.Date}\t{session.Score}\t{session.StackId}");
+                }
+            }
+        }
+
+        public string GetFlashcardsBack(int id)
+        {
+            var backSql = "SELECT Back FROM Flashcards WHERE Id = @Id";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                return connection.QuerySingle<string>(backSql, new { Id = id });
+            }
+        }
+
+        public string GetFlashcardsFront(int id)
+        {
+            var frontSql = "SELECT Front FROM Flashcards WHERE Id = @Id";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                return connection.QuerySingle<string>(frontSql, new { Id = id });
             }
         }
 
@@ -120,20 +189,34 @@ namespace flashcards.Repositories
             {
                 connection.Execute(sql, new { Stack = stack });
             }
+
+            int stackId = GetStackId(stack);
+
+            var sql2 = "DELETE FROM Flashcards WHERE StackId = @StackId";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Execute(sql2, new { StackId = stackId });
+            }
         }
 
-        public void ViewStacksData()
+        public List<string> ViewStacksData()
         {
             using (var connection = new SqlConnection(connectionString))
             {
                 var sql = "SELECT * FROM Stacks";
                 var stacks = connection.Query<Stacks>(sql);
 
+                List<string> stackNames = new List<string>();
+
                 Console.WriteLine("Id\tName");
                 foreach (var stack in stacks)
                 {
+                    stackNames.Add(stack.LanguageName);
                     Console.WriteLine($"{stack.Id}\t{stack.LanguageName}");
                 }
+
+                return stackNames;
             }
         }
 

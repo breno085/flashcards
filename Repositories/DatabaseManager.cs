@@ -31,6 +31,18 @@ namespace flashcards.Repositories
                 );";
 
                 connection.Execute(createFlashcardsTableSql);
+
+                var createStudyTableSql = @"
+                IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Study' AND xtype='U')
+                CREATE TABLE Study (
+                    Id INT PRIMARY KEY IDENTITY(1,1),
+                    Date DATE,
+                    Score INT,
+                    StackId INT,
+                    FOREIGN KEY (StackId) REFERENCES Stacks(Id)
+                );";
+
+                connection.Execute(createStudyTableSql);
             }
         }
     }
